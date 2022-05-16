@@ -36,9 +36,14 @@ public class ThirdPersonMovement : MonoBehaviour
 
     public LayerMask level2Mask;
 
-    public int maxFuel = 100;
-    public int fuel;
+    public float maxFuel = 100;
+    public float fuel;
 
+    private int animationParam;
+
+    public float flipPush = 5f;
+
+    public int doubleJumpInc = 1;
 
     // Start is called before the first frame update
     void Start()
@@ -68,9 +73,12 @@ public class ThirdPersonMovement : MonoBehaviour
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
 
-        if (horizontal > 0 || vertical > 0 && isGrounded || horizontal < 0 || vertical < 0)
+        if (horizontal > 0 || vertical > 0 || horizontal < 0 || vertical < 0)
         {
-            animator.SetInteger("AnimationPar", 1);
+            if (isGrounded)
+            {
+                animationParam = 1;
+            }
         }
 
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
@@ -87,20 +95,27 @@ public class ThirdPersonMovement : MonoBehaviour
         }
         if (isGrounded)
         {
-            fuel = maxFuel;
+            doubleJumpInc = 1;
+            if(fuel < maxFuel)
+            {
+                fuel += 100 * Time.deltaTime;
+            }
             jumpsLeft = maxJumps;
 
         }
 
-        if (isGrounded || fuel == 0) { 
+        if (isGrounded || fuel <= 0) { 
               gameObject.GetComponent<ParticleSystem>().enableEmission = false;
         }
-        if (!isGrounded || horizontal == 0 && vertical == 0)
+        if (!isGrounded && !Input.GetKeyDown(KeyCode.LeftShift) || horizontal == 0 && vertical == 0 && !Input.GetKeyDown(KeyCode.LeftShift))
         {
-            animator.SetInteger("AnimationPar", 0);
+            if (animationParam != 2)
+            {
+                animationParam = 0;
+            }
         }
 
-        if (Input.GetKey(KeyCode.LeftShift) && fuel > 0)
+        if (Input.GetButton("Jump") && !isGrounded && fuel > 0)
         {
             gameObject.GetComponent<ParticleSystem>().enableEmission = true;
 
@@ -108,10 +123,10 @@ public class ThirdPersonMovement : MonoBehaviour
             {
                 velocity.y += jetPackPower * Time.deltaTime;
             }
-            fuel--;
+            fuel -= 100 * Time.deltaTime;
         }
 
-        if (!Input.GetKey(KeyCode.LeftShift) && fuel > 0)
+        if (!Input.GetButton("Jump") && fuel > 0)
         {
             gameObject.GetComponent<ParticleSystem>().enableEmission = false;
         }
@@ -136,5 +151,20 @@ public class ThirdPersonMovement : MonoBehaviour
 
         }
 
+        
+        if(Input.GetKeyDown(KeyCode.LeftShift) && !isGrounded && doubleJumpInc > 0)
+        {
+            animationParam = 2;
+            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            doubleJumpInc--;
+        }
+
+        if(isGrounded && animationParam == 2){
+            animationParam = 0;
+        }
+
+        animator.SetInteger("AnimationPar", animationParam);
+
+        
     }
 }

@@ -9,7 +9,7 @@ public class ChangeCollor : MonoBehaviour
     public Material low;
     private Material material;
 
-    public int fuel;
+    public float fuel;
 
 
     public ThirdPersonMovement playerMovement;
@@ -21,6 +21,7 @@ public class ChangeCollor : MonoBehaviour
     void Update()
     {
         fuel = playerMovement.fuel;
+
         if (fuel > 350)
         {
             GetComponent<MeshRenderer>().material = full;
@@ -30,7 +31,7 @@ public class ChangeCollor : MonoBehaviour
         {
             GetComponent<MeshRenderer>().material = medium;
         }
-        if (fuel == 0)
+        if (fuel <= 0)
         {
             GetComponent<MeshRenderer>().material = low;
         }
