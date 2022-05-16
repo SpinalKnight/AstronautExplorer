@@ -32,6 +32,12 @@ public class ThirdPersonMovement : MonoBehaviour
     private Animator animator;
 
     public float jetPackPower = 0.1f;
+    private bool level2;
+
+    public LayerMask level2Mask;
+
+    public int maxFuel = 100;
+    public int fuel;
 
 
     // Start is called before the first frame update
@@ -44,22 +50,25 @@ public class ThirdPersonMovement : MonoBehaviour
         jumpsLeft = maxJumps;
 
         animator = GetComponentInChildren<Animator>();
+
+        fuel = maxFuel;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
-        if(Player.transform.position.y <= -15)
+
+        if (Player.transform.position.y <= -15)
         {
-             SceneManager.LoadScene("Level1");
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
-        
+
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+        level2 = Physics.CheckSphere(groundCheck.position, groundDistance, level2Mask);
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
 
-        if(horizontal > 0 || vertical > 0 && isGrounded)
+        if (horizontal > 0 || vertical > 0 && isGrounded || horizontal < 0 || vertical < 0)
         {
             animator.SetInteger("AnimationPar", 1);
         }
@@ -76,18 +85,22 @@ public class ThirdPersonMovement : MonoBehaviour
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
             jumpsLeft--;
         }
-        if(isGrounded)
+        if (isGrounded)
         {
+            fuel = maxFuel;
             jumpsLeft = maxJumps;
-            gameObject.GetComponent<ParticleSystem>().enableEmission = false;
 
+        }
+
+        if (isGrounded || fuel == 0) { 
+              gameObject.GetComponent<ParticleSystem>().enableEmission = false;
         }
         if (!isGrounded || horizontal == 0 && vertical == 0)
         {
             animator.SetInteger("AnimationPar", 0);
         }
 
-        if (Input.GetKey(KeyCode.LeftShift))
+        if (Input.GetKey(KeyCode.LeftShift) && fuel > 0)
         {
             gameObject.GetComponent<ParticleSystem>().enableEmission = true;
 
@@ -95,9 +108,10 @@ public class ThirdPersonMovement : MonoBehaviour
             {
                 velocity.y += jetPackPower * Time.deltaTime;
             }
+            fuel--;
         }
 
-        if (!Input.GetKey(KeyCode.LeftShift))
+        if (!Input.GetKey(KeyCode.LeftShift) && fuel > 0)
         {
             gameObject.GetComponent<ParticleSystem>().enableEmission = false;
         }
@@ -106,7 +120,7 @@ public class ThirdPersonMovement : MonoBehaviour
 
         controller.Move(velocity * Time.deltaTime);
 
-        if(direction.magnitude >= 0.1f)
+        if (direction.magnitude >= 0.1f)
         {
             float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
             float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
@@ -115,6 +129,12 @@ public class ThirdPersonMovement : MonoBehaviour
             Vector3 moveDirection = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
             controller.Move(moveDirection.normalized * speed * Time.deltaTime);
         }
-       
+
+        if (level2)
+        {
+            SceneManager.LoadScene("Level2");
+
+        }
+
     }
 }
