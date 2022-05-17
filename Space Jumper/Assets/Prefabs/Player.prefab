@@ -1083,6 +1083,8 @@ MonoBehaviour:
     m_Bits: 256
   maxFuel: 400
   fuel: 0
+  flipPush: 5
+  doubleJumpInc: 1
 --- !u!198 &6515735290225136581
 ParticleSystem:
   m_ObjectHideFlags: 0
@@ -1717,7 +1719,7 @@ ParticleSystem:
     boxThickness: {x: 0, y: 0, z: 0}
     radiusThickness: 1
     donutRadius: 0.2
-    m_Position: {x: 0.000000046889, y: 0.54307055, z: -0.28986898}
+    m_Position: {x: 0.000000046889, y: 0.65011823, z: -0.41222697}
     m_Rotation: {x: 90, y: 0, z: 0}
     m_Scale: {x: 1, y: 1, z: 1}
     placementMode: 0
@@ -1796,7 +1798,7 @@ ParticleSystem:
     m_TextureBilinearFiltering: 0
     randomDirectionAmount: 0
     sphericalDirectionAmount: 0
-    randomPositionAmount: 0.1
+    randomPositionAmount: 0.08
     radius:
       value: 0.01
       mode: 0
@@ -1857,7 +1859,7 @@ ParticleSystem:
     arc:
       value: 360
       mode: 0
-      spread: 0.3
+      spread: 1
       speed:
         serializedVersion: 2
         minMaxState: 0
